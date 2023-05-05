@@ -19,8 +19,8 @@ module.exports = (sequelize, DataTypes) => {
     password: DataTypes.STRING,
     role: DataTypes.STRING,
     accountStatus: DataTypes.STRING,
-    freeSpace: DataTypes.INTEGER,
-    usedSpace: DataTypes.INTEGER
+    freeSpace: DataTypes.FLOAT,
+    usedSpace: DataTypes.FLOAT
   }, {
     sequelize,
     modelName: 'User',

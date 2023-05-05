@@ -6,6 +6,7 @@ const models = require("../models")
 const jwt = require("jsonwebtoken")
 const uuid = require("uuid")
 const bcrypt = require("bcrypt")
+const fs = require('fs');
 require("dotenv").config()
 
 // créer un compte
@@ -40,8 +41,13 @@ route.post("/register",registerInputVerif, (req,res)=>{
     // créer le compte
     function createAccount(){
         
-
         const myUUID = uuid.v4()
+
+        const folderPath = './datadrive/'+myUUID;
+        if (!fs.existsSync(folderPath)) 
+        {
+            fs.mkdirSync(folderPath);
+        }
         
         models.User.create({
             id:myUUID,
@@ -106,7 +112,6 @@ route.post("/login", loginInputVerif , (req,res)=>{
             }
         })
         .catch((error)=>{return res.status(500).json(error)})
-
 })
 
 module.exports = route
