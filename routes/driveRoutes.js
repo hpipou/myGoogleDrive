@@ -9,6 +9,10 @@ const multerErrorHendler = require("../middleware/multerErrorCapture")
 const models = require("../models")
 const validator = require("validator")
 const archiver = require('archiver');
+require("dotenv").config()
+
+// Définir la capacité de stockage max pour chaque utilisateur en Mo
+const driveSize = process.env.SPACESIZE
 
 //////////////////////////////////////////////////////////////////////
 // afficher la liste des documents 
@@ -18,7 +22,7 @@ route.get("", tokenVerification, (req,res)=>{
     const token = req.headers.authorization.split(" ")[1]
     const tokenDecoded = jwt.decode(token)
 
-    const dirPath = path.join(__dirname,'..' ,'datadrive', tokenDecoded.id);
+    const dirPath = path.join(__dirname,'..' , process.env.FOLDERDRIVE , tokenDecoded.id);
 
     fs.readdir(dirPath, function(err, files) {
         if (err) {
@@ -62,9 +66,9 @@ route.post("", tokenVerification, multer.single('file'), multerErrorHendler, (re
             const newUsedSpace = data.usedSpace + fileSizeReq
             const newFreeSpace = data.freeSpace - fileSizeReq
             
-            if(newUsedSpace>100){
+            if(newUsedSpace>driveSize){
 
-                const dirPath = path.join(__dirname,'..' ,'datadrive', tokenDecoded.id, req.myName );
+                const dirPath = path.join(__dirname,'..' , process.env.FOLDERDRIVE , tokenDecoded.id, req.myName );
                 fs.unlinkSync(dirPath)
 
                 return res.status(403).json({
@@ -116,7 +120,7 @@ route.delete("", tokenVerification, (req,res)=>{
     const token = req.headers.authorization.split(" ")[1]
     const tokenDecoded = jwt.decode(token)
 
-    const dirPath = path.join(__dirname,'..' ,'datadrive', tokenDecoded.id, fileNameBody );
+    const dirPath = path.join(__dirname,'..' , process.env.FOLDERDRIVE , tokenDecoded.id, fileNameBody );
 
     // vérifier si le fichier existe
     if (fs.existsSync(dirPath)) {
@@ -190,7 +194,7 @@ route.get("/file", tokenVerification, (req,res)=>{
     const token = req.headers.authorization.split(" ")[1]
     const tokenDecoded = jwt.decode(token)
 
-    const dirPath = path.join(__dirname,'..' ,'datadrive', tokenDecoded.id, fileNameBody );
+    const dirPath = path.join(__dirname,'..' , process.env.FOLDERDRIVE , tokenDecoded.id, fileNameBody );
 
     // vérifier si le fichier existe
     if (fs.existsSync(dirPath)) {
@@ -259,7 +263,7 @@ route.get("/files", tokenVerification, (req,res)=>{
     // vérifier si les fichiers existent
     fileNameBody.forEach(element =>{ 
         
-        dirPath = path.join(__dirname,'..' ,'datadrive', tokenDecoded.id, element );
+        dirPath = path.join(__dirname,'..' , process.env.FOLDERDRIVE , tokenDecoded.id, element );
         // vérifier si le fichier existe
         if (fs.existsSync(dirPath)) {
             // FILE EXIST
@@ -281,7 +285,7 @@ route.get("/files", tokenVerification, (req,res)=>{
     res.setHeader('Content-type', `application/zip`);
 
     // planifier la suppression du fichier après 3 minutes de sa génération
-    setTimeout(() => { fs.unlinkSync(zipPath) }, 180000);
+    setTimeout(() => { fs.unlinkSync(zipPath) }, process.env.DELETEIN);
 
     // Lire le contenu du fichier et le transmettre au client
     const fileStream = fs.createReadStream(dirPath);

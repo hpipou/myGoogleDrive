@@ -19,9 +19,21 @@ const fileStorage= multer.diskStorage({
 })
 
 const upload=multer({storage:fileStorage, 
-                     limits:{fileSize:10000000},
+                     limits:{fileSize:1000000},
                      fileFilter:(req,file,callback)=>{
-                        if(path.extname(file.originalname)=='.png' || path.extname(file.originalname)=='.jpg' || path.extname(file.originalname)=='.jpeg'){callback(null, true)}
+                        if(
+                            path.extname(file.originalname)=='.png' || 
+                            path.extname(file.originalname)=='.jpg' || 
+                            path.extname(file.originalname)=='.jpeg'||
+                            path.extname(file.originalname)=='.pdf' ||
+                            path.extname(file.originalname)=='.mp3' ||
+                            path.extname(file.originalname)=='.zip' ||
+                            path.extname(file.originalname)=='.docx'||
+                            path.extname(file.originalname)=='.xlsx'||
+                            path.extname(file.originalname)=='.mp4 '||
+                            path.extname(file.originalname)=='.txt'
+                            
+                           ){callback(null, true)}
                         else{callback(new Error("Fichier non supproté"))}
                      }})
 

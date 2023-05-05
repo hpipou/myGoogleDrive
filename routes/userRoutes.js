@@ -8,8 +8,12 @@ const uuid = require("uuid")
 const bcrypt = require("bcrypt")
 const fs = require('fs');
 require("dotenv").config()
+// Définir la capacité de stockage max pour chaque utilisateur en Mo
+const driveSize = process.env.SPACESIZE
 
+////////////////////////////////////////////////////////////////////////////////
 // créer un compte
+////////////////////////////////////////////////////////////////////////////////
 route.post("/register",registerInputVerif, (req,res)=>{
 
     
@@ -43,7 +47,8 @@ route.post("/register",registerInputVerif, (req,res)=>{
         
         const myUUID = uuid.v4()
 
-        const folderPath = './datadrive/'+myUUID;
+        const folderPath = './' +  process.env.FOLDERDRIVE  + '/' + myUUID;
+        
         if (!fs.existsSync(folderPath)) 
         {
             fs.mkdirSync(folderPath);
@@ -56,7 +61,7 @@ route.post("/register",registerInputVerif, (req,res)=>{
             password: bcrypt.hashSync(req.body.password, 5),
             role:"USER",
             accountStatus:"ACTIVE",
-            freeSpace: 100,
+            freeSpace: driveSize,
             usedSpace: 0
         })
         .then(()=>{
@@ -79,7 +84,9 @@ route.post("/register",registerInputVerif, (req,res)=>{
 
 })
 
+////////////////////////////////////////////////////////////////////////////////
 // se connecter
+////////////////////////////////////////////////////////////////////////////////
 route.post("/login", loginInputVerif , (req,res)=>{
 
 
